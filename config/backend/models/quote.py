@@ -33,10 +33,15 @@ class Quote(models.Model):
     source = models.ForeignKey(
         "Source", on_delete=models.CASCADE, verbose_name="Источник"
     )
-    weight = models.FloatField(
-        default=1.0,
-        verbose_name="Вес",
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    weight = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=1,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(1)
+        ],
+        verbose_name="Вес (от 0 до 1)"
     )
     views = models.PositiveIntegerField(default=0, verbose_name="Просмотры")
     likes = models.PositiveIntegerField(default=0, verbose_name="Лайки")

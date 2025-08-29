@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Источник успешно добавлен!</h1>
+  <p>
+    Ваш источник сохранён. <a href="{% url 'add_source' %}">Добавить ещё один?</a>
+  </p>
+  <p>
+    <a href="{% url 'source_list' %}">
+      <button type="button">Вернуться к списку источников</button>
+    </a>
+  </p>
+{% endblock %}

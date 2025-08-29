@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Добавить источник цитаты</h1>
+  <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Сохранить">
+  </form>
+  <p>
+    <a href="{% url 'add_quote' %}">Добавить цитату</a>
+  </p>
+  <p>
+    <a href="{% url 'quotes_list' %}">
+      <button type="button">Вернуться к списку цитат</button>
+    </a>
+  </p>
+{% endblock %}

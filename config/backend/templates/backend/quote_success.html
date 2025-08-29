@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Цитата успешно добавлена!</h1>
+  <p>
+    Ваша цитата сохранена.
+    <a href="{% url 'add_quote' %}">Добавить ещё одну?</a>
+  </p>
+  <p>
+    <a href="{% url 'quotes_list' %}">
+      <button type="button">Вернуться к списку цитат</button>
+    </a>
+  </p>
+{% endblock %}

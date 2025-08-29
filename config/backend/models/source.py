@@ -45,6 +45,9 @@ class Source(models.Model):
         validators=[MaxValueValidator(MAX_SOURCE_YEAR)],
     )
     details = models.TextField(blank=True, verbose_name="Дополнительные сведения")
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Дата и время добавления"
+    )
 
     def __str__(self):
         return f"{self.name} ({self.get_source_type_display()})"

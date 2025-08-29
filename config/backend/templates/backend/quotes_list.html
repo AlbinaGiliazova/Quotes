@@ -16,7 +16,7 @@
     {% for quote in quotes %}
       <li>
         <strong>{{ quote.text }}</strong><br>
-        <em>Источник:</em> {{ quote.source }}<br>
+        <em>Источник:</em> <a href="{% url 'source_detail' quote.source %}">{{ quote.source }}</a><br>
         <em>Вес:</em> {{ quote.weight }}
       </li>
     {% empty %}

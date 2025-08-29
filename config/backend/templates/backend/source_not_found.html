@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Цитаты источника: "{{ source }}"</h2>
+  <a href="{% url 'quotes_list' %}">&larr; Все цитаты</a>
+  <p>Источник не найден.</p>
+{% endblock %}

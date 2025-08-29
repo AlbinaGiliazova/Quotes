@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Цитаты источника: "{{ source }}"</h2>
+  <a href="{% url 'quotes_list' %}">&larr; Все цитаты</a>
+  {% if quotes %}
+    <ul>
+      {% for quote in quotes %}
+        <li>
+          <strong>{{ quote.text }}</strong><br>
+          <em>Вес:</em> {{ quote.weight }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>У этого источника пока нет цитат.</p>
+  {% endif %}
+{% endblock %}
