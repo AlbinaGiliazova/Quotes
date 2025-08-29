@@ -1,0 +1,6 @@
+"""Константы бэкенда."""
+
+SOURCE_NAME_MAX_LENGTH: int = 255
+SOURCE_TYPE_MAX_LENGTH: int = 20
+SOURCE_AUTHOR_MAX_LENGTH: int = 255
+MAX_SOURCE_YEAR: int = 2100
