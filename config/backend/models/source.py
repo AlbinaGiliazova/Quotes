@@ -24,7 +24,9 @@ class Source(models.Model):
     ]
 
     name = models.CharField(
-        max_length=SOURCE_NAME_MAX_LENGTH, verbose_name='Название'
+        max_length=SOURCE_NAME_MAX_LENGTH,
+        verbose_name='Название',
+        unique=True,
     )
     source_type = models.CharField(
         max_length=SOURCE_TYPE_MAX_LENGTH,
