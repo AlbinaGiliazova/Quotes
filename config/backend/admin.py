@@ -1,7 +1,15 @@
 """Админка."""
 
 from django.contrib import admin
-from backend.models import Quote, Source
+from django.contrib.auth.admin import UserAdmin
+
+from backend.models import Quote, Source, CustomUser
+
+
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    search_fields = ('username', 'email')
 
 
 @admin.register(Quote)

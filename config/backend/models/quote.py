@@ -1,21 +1,37 @@
 """Модель цитаты."""
 
+import re
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 
-from backend.models import Source
+from backend.constants import NORMALIZED_TEXT_MAX_LENGTH
 
 User = get_user_model()
+
+
+def normalize_text(text):
+    """Нормализация текста."""
+    # переводим в нижний регистр
+    text = text.lower()
+    # убираем пробелы, кавычки, апострофы и все небуквенно-цифровые символы
+    text = re.sub(r'[\s"\'«»“”‘’„,.!?;:()\[\]{}…\-–—]', '', text)
+    return text
 
 
 class Quote(models.Model):
     """Модель цитаты."""
 
     text = models.TextField(verbose_name='Текст цитаты')
+    normalized_text = models.CharField(
+        max_length=NORMALIZED_TEXT_MAX_LENGTH, 
+        unique=True, 
+        editable=False, 
+        verbose_name='Нормализованный текст'
+    )
     source = models.ForeignKey(
-        Source, on_delete=models.CASCADE, verbose_name='Источник'
+        'Source', on_delete=models.CASCADE, verbose_name='Источник'
     )
     weight = models.FloatField(
         default=1.0,
@@ -45,7 +61,18 @@ class Quote(models.Model):
         if self.pk:
             existing_quotes = existing_quotes.exclude(pk=self.pk)
         if existing_quotes.count() >= 3:
-            raise ValidationError('У этого источника уже три цитаты — добавить ещё нельзя.')
+            raise ValidationError(
+                'У этого источника уже три цитаты — добавить ещё нельзя.'
+            )
+        normalized = normalize_text(self.text)
+        qs = Quote.objects.all()
+        if self.pk:
+            qs = qs.exclude(pk=self.pk)
+        if qs.filter(normalized_text=normalized).exists():
+            raise ValidationError(
+                'Такая цитата уже существует (с учётом нормализации).'
+            )
+        self.normalized_text = normalized
 
     def save(self, *args, **kwargs):
         self.full_clean()  # Чтобы clean сработал и в save()
