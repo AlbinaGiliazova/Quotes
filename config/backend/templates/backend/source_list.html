@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Список источников</h1>
+  {% if page_obj.object_list %}
+    <ul>
+      {% for source in page_obj.object_list %}
+        <li>
+          <a href="{% url 'source_detail' source.id %}">
+            <strong>{{ source.name }}</strong>
+          </a>
+          {% if source.author %}
+            | Автор: {{ source.author }}
+          {% endif %}
+          {% if source.year %}
+            | Год: {{ source.year }}
+          {% endif %}
+          | Тип: {{ source.get_source_type_display }}
+          {% if source.details %}
+            <br>Подробности: {{ source.details }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}">назад</a>
+      {% endif %}
+      <span>
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+      </span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">вперёд</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <p>Источников пока нет.</p>
+  {% endif %}
+  <p>
+    <a href="{% url 'add_source' %}">
+      <button type="button">Добавить источник</button>
+    </a>
+  </p>
+  <p>
+    <a href="{% url 'add_quote' %}">
+      <button type="button">Добавить цитату</button>
+    </a>
+  </p>
+  <p>
+    <a href="{% url 'quotes_list' %}">
+      <button type="button">Вернуться к списку цитат</button>
+    </a>
+  </p>
+{% endblock %}

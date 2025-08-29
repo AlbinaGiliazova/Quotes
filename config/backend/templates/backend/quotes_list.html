@@ -4,26 +4,22 @@
   <h2>Все цитаты</h2>
   <a href="{% url 'add_quote' %}">Добавить цитату</a>
 
-  <form method="get" style="margin: 1em 0;">
-    <input type="text" name="source" value="{{ source_query }}" placeholder="Поиск по источнику">
-    <button type="submit">Поиск</button>
-    {% if source_query %}
-      <a href="{% url 'quotes_list' %}">Очистить</a>
-    {% endif %}
-  </form>
-
   <ul>
     {% for quote in quotes %}
       <li>
         <strong>{{ quote.text }}</strong><br>
-        <em>Источник:</em> <a href="{% url 'source_detail' quote.source %}">{{ quote.source }}</a><br>
+        <em>Источник:</em> <a href="{% url 'source_detail' quote.source.id %}">{{ quote.source }}</a><br>
         <em>Вес:</em> {{ quote.weight }}
       </li>
     {% empty %}
       <li>Цитат пока нет.</li>
     {% endfor %}
   </ul>
-
+  <p>
+    <a href="{% url 'source_list' %}">
+      <button type="button">Список источников</button>
+    </a>
+  </p>
   {% if page_obj.has_other_pages %}
     <nav>
       <ul style="list-style: none; display: flex; gap: 5px; padding: 0;">

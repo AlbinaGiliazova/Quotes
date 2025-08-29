@@ -8,11 +8,17 @@
       <input type="submit" value="Сохранить">
   </form>
   <p>
-    <a href="{% url 'add_quote' %}">Добавить цитату</a>
+    <a href="{% url 'add_quote' %}">
+        <button type="button">Добавить цитату</button></a>
   </p>
   <p>
     <a href="{% url 'quotes_list' %}">
       <button type="button">Вернуться к списку цитат</button>
+    </a>
+  </p>
+  <p>
+    <a href="{% url 'source_list' %}">
+      <button type="button">Вернуться к списку источников</button>
     </a>
   </p>
 {% endblock %}

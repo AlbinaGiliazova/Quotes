@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 
 from backend.forms import QuoteForm, SourceForm
 from backend.models import Quote, Source
-from backend.constants import NUM_QUOTES_PER_PAGE
+from backend.constants import NUM_QUOTES_PER_PAGE, NUM_SOURCES_PER_PAGE
 
 
 def add_quote(request):
@@ -24,13 +24,9 @@ def add_quote(request):
 
 def quotes_list(request):
     """Страница списка цитат."""
-    source_query = request.GET.get("source", "")
     page_number = request.GET.get("page", 1)
 
-    if source_query:
-        quotes = Quote.objects.filter(source__icontains=source_query).order_by("-id")
-    else:
-        quotes = Quote.objects.all().order_by("-id")
+    quotes = Quote.objects.all().order_by("-id")
     paginator = Paginator(quotes, NUM_QUOTES_PER_PAGE)  # 10 цитат на страницу
 
     page_obj = paginator.get_page(page_number)
@@ -41,7 +37,6 @@ def quotes_list(request):
         {
             "quotes": page_obj.object_list,
             "page_obj": page_obj,
-            "source_query": source_query,
         },
     )
 
@@ -63,18 +58,20 @@ def add_source(request):
             return redirect('source_success')  # или нужный вам редирект
     else:
         form = SourceForm()
-    return render(request, 'add_source.html', {'form': form})
+    return render(request, 'backend/add_source.html', {'form': form})
 
 
 def source_success(request):
-    return render(request, 'source_success.html')
+    return render(request, 'backend/source_success.html')
 
 
 def source_list(request):
-    """Список источников."""
-    sources = Source.objects.all()
-    return render(request, 'source_list.html', {'sources': sources})
+    sources = Source.objects.all().order_by('name')
+    paginator = Paginator(sources, NUM_SOURCES_PER_PAGE)  # Показывать по 10 источников на страницу
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'backend/source_list.html', {'page_obj': page_obj})
 
 
 def quote_success(request):
-    return render(request, 'quote_success.html')
+    return render(request, 'backend/quote_success.html')
