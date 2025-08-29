@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Добавить цитату</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>
+      {{ form.text.label_tag }}<br>
+      {{ form.text }}
+      {{ form.text.errors }}
+    </div>
+    <div>
+      {{ form.source.label_tag }}<br>
+      {{ form.source }}
+      {{ form.source.errors }}
+    </div>
+    <div>
+      {{ form.weight.label_tag }}<br>
+      {{ form.weight }}
+      {{ form.weight.errors }}
+    </div>
+    <button type="submit">Сохранить</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Все цитаты</h2>
+  <a href="{% url 'add_quote' %}">Добавить цитату</a>
+
+  <form method="get" style="margin: 1em 0;">
+    <input type="text" name="source" value="{{ source_query }}" placeholder="Поиск по источнику">
+    <button type="submit">Поиск</button>
+    {% if source_query %}
+      <a href="{% url 'quotes_list' %}">Очистить</a>
+    {% endif %}
+  </form>
+
+  <ul>
+    {% for quote in quotes %}
+      <li>
+        <strong>{{ quote.text }}</strong><br>
+        <em>Источник:</em> {{ quote.source }}<br>
+        <em>Вес:</em> {{ quote.weight }}
+      </li>
+    {% empty %}
+      <li>Цитат пока нет.</li>
+    {% endfor %}
+  </ul>
+
+  {% if page_obj.has_other_pages %}
+    <nav>
+      <ul style="list-style: none; display: flex; gap: 5px; padding: 0;">
+        {% if page_obj.has_previous %}
+          <li><a href="?{% if source_query %}source={{ source_query }}&{% endif %}page=1">&laquo; В начало</a></li>
+          <li><a href="?{% if source_query %}source={{ source_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Назад</a></li>
+        {% endif %}
+
+        <li>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</li>
+
+        {% if page_obj.has_next %}
+          <li><a href="?{% if source_query %}source={{ source_query }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд</a></li>
+          <li><a href="?{% if source_query %}source={{ source_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}">В конец &raquo;</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+{% endblock %}

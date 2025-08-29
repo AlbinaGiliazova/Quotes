@@ -3,7 +3,7 @@ from .quote import Quote
 from .source import Source
 
 __all__ = (
-    'CustomUser',
-    'Quote',
-    'Source',
+    "CustomUser",
+    "Quote",
+    "Source",
 )

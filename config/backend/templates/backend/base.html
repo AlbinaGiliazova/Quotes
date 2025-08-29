@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Цитаты{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f9f9f9; color: #222; }
+        a { color: #2563eb; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        h2 { margin-top: 0; }
+        form { margin-bottom: 20px; }
+        ul { padding-left: 18px; }
+        nav ul { display: flex; align-items: center; gap: 10px; }
+        nav li { display: inline; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="{% url 'quotes_list' %}">Цитаты</a></h1>
+        <hr>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
