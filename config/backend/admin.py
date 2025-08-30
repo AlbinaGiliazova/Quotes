@@ -20,8 +20,6 @@ class QuoteAdmin(admin.ModelAdmin):
         "get_source_name",
         "weight",
         "views",
-        "likes",
-        "dislikes",
         "created_at",
         "added_by",
         "get_added_by",

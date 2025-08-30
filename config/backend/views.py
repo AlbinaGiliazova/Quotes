@@ -1,13 +1,25 @@
 """Вью приложения."""
 
-from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
+import random
 
-from backend.forms import QuoteForm, SourceForm
-from backend.models import Quote, Source
+from django.shortcuts import (render,
+                              redirect,
+                              get_object_or_404,
+)
+from django.core.paginator import Paginator
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.db.models import Count, Q
+
+from backend.forms import QuoteForm, SourceForm, RegisterForm
+from backend.models import Quote, Source, QuoteVote
 from backend.constants import NUM_QUOTES_PER_PAGE, NUM_SOURCES_PER_PAGE
 
+User = get_user_model()
 
+
+@login_required
 def add_quote(request):
     """Страница добавления цитаты"""
     if request.method == "POST":
@@ -26,7 +38,10 @@ def quotes_list(request):
     """Страница списка цитат."""
     page_number = request.GET.get("page", 1)
 
-    quotes = Quote.objects.all().order_by("-id")
+    quotes = Quote.objects.annotate(
+        likes_count=Count('votes', filter=Q(votes__value=1)),
+        dislikes_count=Count('votes', filter=Q(votes__value=-1))
+    ).order_by("-id")
     paginator = Paginator(quotes, NUM_QUOTES_PER_PAGE)  # 10 цитат на страницу
 
     page_obj = paginator.get_page(page_number)
@@ -50,6 +65,7 @@ def source_detail(request, source):
     return render(request, "backend/source_detail.html", {"quotes": quotes, "source": source})
 
 
+@login_required
 def add_source(request):
     if request.method == 'POST':
         form = SourceForm(request.POST)
@@ -75,3 +91,46 @@ def source_list(request):
 
 def quote_success(request):
     return render(request, 'backend/quote_success.html')
+
+
+def register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            new_user = form.save(commit=False)
+            new_user.set_password(form.cleaned_data['password'])
+            new_user.save()
+            return redirect('login')  # перенаправление на страницу входа
+    else:
+        form = RegisterForm()
+    return render(request, 'backend/register.html', {'form': form})
+
+
+def random_weighted_quote(request):
+    quotes = Quote.objects.all()
+    weighted_quotes = []
+    for quote in quotes:
+        if quote.weight > 0:
+            weighted_quotes.append((quote, float(quote.weight)))
+    if not weighted_quotes:
+        quote = None
+    else:
+        items, weights = zip(*weighted_quotes)
+        quote = random.choices(items, weights=weights, k=1)[0]
+    return render(request, 'backend/weighted_random.html', {'quote': quote})
+
+@login_required
+def vote_quote(request):
+    if request.method == 'POST':
+        quote_id = request.POST.get('quote_id')
+        value = int(request.POST.get('value'))  # 1 или -1
+        quote = get_object_or_404(Quote, id=quote_id)
+        vote, created = QuoteVote.objects.update_or_create(
+            user=request.user, quote=quote,
+            defaults={'value': value}
+        )
+        # Подсчёт лайков и дизлайков
+        likes = quote.votes.filter(value=1).count()
+        dislikes = quote.votes.filter(value=-1).count()
+        return JsonResponse({'likes': likes, 'dislikes': dislikes})
+    return JsonResponse({'error': 'Некорректный запрос'}, status=400)

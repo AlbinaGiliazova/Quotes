@@ -1,8 +1,14 @@
+"""Формы."""
+
 from django import forms
 from backend.models import Quote, Source
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class QuoteForm(forms.ModelForm):
+    """Форма добавления цитаты."""
     weight = forms.DecimalField(
         min_value=0,
         max_value=1,
@@ -40,6 +46,7 @@ class QuoteForm(forms.ModelForm):
 
 
 class SourceForm(forms.ModelForm):
+    """Форма добавления исочника."""
     class Meta:
         model = Source
         fields = ['name',
@@ -48,3 +55,19 @@ class SourceForm(forms.ModelForm):
                   'year',
                   'details',
                   ]
+        
+
+class RegisterForm(forms.ModelForm):
+    """Форма регистрации пользователя."""
+    password = forms.CharField(widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Повторите пароль', widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+    def clean_password2(self):
+        cd = self.cleaned_data
+        if cd['password'] != cd['password2']:
+            raise forms.ValidationError('Пароли не совпадают.')
+        return cd['password2']

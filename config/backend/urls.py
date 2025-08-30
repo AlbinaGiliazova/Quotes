@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 from backend.views import (add_quote,
                            quotes_list,
@@ -7,6 +8,9 @@ from backend.views import (add_quote,
                            source_success,
                            source_list,
                            quote_success,
+                           register,
+                           random_weighted_quote,
+                           vote_quote,
 )
 
 urlpatterns = [
@@ -17,4 +21,12 @@ urlpatterns = [
     path('source-success/', source_success, name='source_success'),
     path('sources/', source_list, name='source_list'),
     path('quote-success/', quote_success, name='quote_success'),
+    path('register/', register, name='register'),
+    path('login/',
+         auth_views.LoginView.as_view(template_name='backend/login.html'),
+         name='login'
+    ),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('random/', random_weighted_quote, name='random_weighted_quote'),
+    path('vote_quote/', vote_quote, name='vote_quote'),
 ]

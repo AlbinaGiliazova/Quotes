@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Случайная цитата</h2>
+  {% if quote %}
+    <blockquote>{{ quote.text }}</blockquote>
+    <p><em>{{ quote.source }}</em></p>
+    <p>Вес: {{ quote.weight }}</p>
+  {% else %}
+    <p>Нет доступных цитат.</p>
+  {% endif %}
+  <p><a href="{% url 'random_weighted_quote' %}">Показать другую</a></p>
+  <p><a href="{% url 'quotes_list' %}">Вернуться к списку цитат</a></p>
+{% endblock %}

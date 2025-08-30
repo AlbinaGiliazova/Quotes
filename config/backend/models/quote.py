@@ -44,8 +44,6 @@ class Quote(models.Model):
         verbose_name="Вес (от 0 до 1)"
     )
     views = models.PositiveIntegerField(default=0, verbose_name="Просмотры")
-    likes = models.PositiveIntegerField(default=0, verbose_name="Лайки")
-    dislikes = models.PositiveIntegerField(default=0, verbose_name="Дизлайки")
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name="Дата и время добавления"
     )

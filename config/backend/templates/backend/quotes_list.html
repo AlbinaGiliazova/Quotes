@@ -6,10 +6,24 @@
 
   <ul>
     {% for quote in quotes %}
-      <li>
+      <li class="quote" data-id="{{ quote.id }}">
         <strong>{{ quote.text }}</strong><br>
         <em>Источник:</em> <a href="{% url 'source_detail' quote.source.id %}">{{ quote.source }}</a><br>
         <em>Вес:</em> {{ quote.weight }}
+        <div>
+      {% if user.is_authenticated %}
+  <button class="like-btn">👍</button>
+  <span class="like-count">{{ quote.likes_count }}</span>
+  <button class="dislike-btn">👎</button>
+  <span class="dislike-count">{{ quote.dislikes_count }}</span>
+{% else %}
+  <button class="like-btn" disabled>👍</button>
+  <span class="like-count">{{ quote.likes_count }}</span>
+  <button class="dislike-btn" disabled>👎</button>
+  <span class="dislike-count">{{ quote.dislikes_count }}</span>
+  <span> (Войдите, чтобы голосовать)</span>
+{% endif %}
+    </div>
       </li>
     {% empty %}
       <li>Цитат пока нет.</li>
@@ -20,6 +34,17 @@
       <button type="button">Список источников</button>
     </a>
   </p>
+  {% if user.is_authenticated %}
+  <p>Вы авторизованы</p>
+{% else %}
+  <p>
+    <a href="{% url 'login' %}">
+      <button type="button">Войти на сайт</button>
+    </a>
+  </p>
+{% endif %}
+  <p><a href="{% url 'random_weighted_quote' %}">
+    <button type="button"></button>Показать случайную цитату</button></a></p>
   {% if page_obj.has_other_pages %}
     <nav>
       <ul style="list-style: none; display: flex; gap: 5px; padding: 0;">
@@ -37,4 +62,55 @@
       </ul>
     </nav>
   {% endif %}
+
+  <script>
+    const csrfToken = '{{ csrf_token }}';
+    headers: {
+  'X-CSRFToken': csrfToken,
+  'Content-Type': 'application/x-www-form-urlencoded'
+}
+document.querySelectorAll('.quote').forEach(function(el) {
+  var quoteId = el.getAttribute('data-id');
+  var likeBtn = el.querySelector('.like-btn');
+  var dislikeBtn = el.querySelector('.dislike-btn');
+  var likeCount = el.querySelector('.like-count');
+  var dislikeCount = el.querySelector('.dislike-count');
+
+   if (likeBtn && !likeBtn.disabled) {
+    likeBtn.onclick = function() {
+      fetch("{% url 'vote_quote' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'quote_id=' + quoteId + '&value=1'
+      })
+      .then(response => response.json())
+      .then(data => {
+        likeCount.textContent = data.likes;
+        dislikeCount.textContent = data.dislikes;
+      });
+    };
+  }
+
+  if (dislikeBtn && !dislikeBtn.disabled) {
+    dislikeBtn.onclick = function() {
+      fetch("{% url 'vote_quote' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'quote_id=' + quoteId + '&value=-1'
+      })
+      .then(response => response.json())
+      .then(data => {
+        likeCount.textContent = data.likes;
+        dislikeCount.textContent = data.dislikes;
+      });
+    };
+  }
+});
+</script>
 {% endblock %}
