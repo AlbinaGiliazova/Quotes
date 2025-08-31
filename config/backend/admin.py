@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from backend.models import Quote, Source, CustomUser
+from backend.models import Quote, Source, CustomUser, QuoteVote
 
 
 @admin.register(CustomUser)
@@ -45,3 +45,10 @@ class SourceAdmin(admin.ModelAdmin):
     list_display = ("name", "source_type", "author", "year", "details")
     search_fields = ("name", "author")
     list_filter = ("source_type", "year")
+
+
+@admin.register(QuoteVote)
+class QuoteVoteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'quote', 'value')
+    list_filter = ('value', 'user')
+    search_fields = ('user__username')
