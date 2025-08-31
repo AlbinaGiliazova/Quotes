@@ -39,9 +39,6 @@ class QuoteAdmin(admin.ModelAdmin):
     def get_added_by(self, obj):
         return obj.added_by.username
 
-    get_added_by.short_description = "Пользователь"
-    get_source_name.short_description = "Источник"
-
 
 @admin.register(Source)
 class SourceAdmin(admin.ModelAdmin):
