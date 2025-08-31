@@ -21,6 +21,7 @@ User = get_user_model()
 
 @login_required
 def add_quote(request):
+    """Добавление цитаты."""
     if request.method == 'POST':
         form = QuoteForm(request.POST)
         if form.is_valid():
@@ -66,6 +67,7 @@ def source_detail(request, source_id):
 
 @login_required
 def add_source(request):
+    """Добавление источника."""
     if request.method == 'POST':
         form = SourceForm(request.POST)
         if form.is_valid():
@@ -77,10 +79,12 @@ def add_source(request):
 
 
 def source_success(request):
+    """Успех добавления источника."""
     return render(request, 'backend/source_success.html')
 
 
 def source_list(request):
+    """Список источников."""
     sources = Source.objects.all().order_by('name')
     paginator = Paginator(sources, NUM_SOURCES_PER_PAGE)  # Показывать по 10 источников на страницу
     page_number = request.GET.get('page')
@@ -89,10 +93,12 @@ def source_list(request):
 
 
 def quote_success(request):
+    """Успех добавления цитаты."""
     return render(request, 'backend/quote_success.html')
 
 
 def register(request):
+    """Регистрация пользователя."""
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -106,6 +112,7 @@ def register(request):
 
 
 def random_weighted_quote(request):
+    """Страница случайной цитаты."""
     quotes = Quote.objects.annotate(
         likes_count=Count('votes', filter=Q(votes__value=1)),
         dislikes_count=Count('votes', filter=Q(votes__value=-1))
@@ -124,6 +131,7 @@ def random_weighted_quote(request):
 
 @login_required
 def vote_quote(request):
+    """Добавление лайка или дизлайка."""
     if request.method == 'POST':
         quote_id = request.POST.get('quote_id')
         value = int(request.POST.get('value'))  # 1 или -1
@@ -140,6 +148,7 @@ def vote_quote(request):
 
 
 def top_quotes(request):
+    """Список топ-10 цитат."""
     quotes = (
         Quote.objects.annotate(
             likes=Count('votes', filter=Q(votes__value=1))
