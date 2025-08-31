@@ -11,12 +11,13 @@ from backend.views import (add_quote,
                            register,
                            random_weighted_quote,
                            vote_quote,
+                           top_quotes,
 )
 
 urlpatterns = [
     path("", quotes_list, name="quotes_list"),
     path("add/", add_quote, name="add_quote"),
-    path('source/<str:source>/', source_detail, name='source_detail'),
+    path('source/<int:source_id>/', source_detail, name='source_detail'),
     path('add-source/', add_source, name='add_source'),
     path('source-success/', source_success, name='source_success'),
     path('sources/', source_list, name='source_list'),
@@ -29,4 +30,5 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('random/', random_weighted_quote, name='random_weighted_quote'),
     path('vote_quote/', vote_quote, name='vote_quote'),
+    path('top-quotes/', top_quotes, name='top_quotes'),
 ]

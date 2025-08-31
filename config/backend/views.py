@@ -21,17 +21,16 @@ User = get_user_model()
 
 @login_required
 def add_quote(request):
-    """Страница добавления цитаты"""
-    if request.method == "POST":
+    if request.method == 'POST':
         form = QuoteForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("quote_success")  
+            quote = form.save(commit=False)
+            quote.added_by = request.user
+            quote.save()
+            return redirect('quotes_list')  # или куда надо
     else:
         form = QuoteForm()
-    return render(request,
-                  "backend/add_quote.html",
-                  {"form": form})
+    return render(request, 'backend/add_quote.html', {'form': form})
 
 
 def quotes_list(request):
@@ -56,14 +55,14 @@ def quotes_list(request):
     )
 
 
-def source_detail(request, source):
+def source_detail(request, source_id):
     """Страница цитат одного источника."""
+    source = get_object_or_404(Source, pk=source_id)
     quotes = Quote.objects.filter(source=source)
-    if not quotes.exists():
-        # Можно вернуть 404, если такого источника нет вообще
-        return render(request, "backend/source_not_found.html", {"source": source})
-    return render(request, "backend/source_detail.html", {"quotes": quotes, "source": source})
-
+    return render(request,
+                  "backend/source_detail.html",
+                  {"quotes": quotes, "source": source}
+    )
 
 @login_required
 def add_source(request):
@@ -107,16 +106,20 @@ def register(request):
 
 
 def random_weighted_quote(request):
-    quotes = Quote.objects.all()
-    weighted_quotes = []
-    for quote in quotes:
-        if quote.weight > 0:
-            weighted_quotes.append((quote, float(quote.weight)))
+    quotes = Quote.objects.annotate(
+        likes_count=Count('votes', filter=Q(votes__value=1)),
+        dislikes_count=Count('votes', filter=Q(votes__value=-1))
+    )
+    weighted_quotes = [
+        (quote, float(quote.weight)) for quote in quotes if quote.weight > 0
+    ]
     if not weighted_quotes:
         quote = None
     else:
         items, weights = zip(*weighted_quotes)
         quote = random.choices(items, weights=weights, k=1)[0]
+        Quote.objects.filter(pk=quote.pk).update(views=quote.views + 1)
+        quote.refresh_from_db()
     return render(request, 'backend/weighted_random.html', {'quote': quote})
 
 @login_required
@@ -134,3 +137,14 @@ def vote_quote(request):
         dislikes = quote.votes.filter(value=-1).count()
         return JsonResponse({'likes': likes, 'dislikes': dislikes})
     return JsonResponse({'error': 'Некорректный запрос'}, status=400)
+
+
+def top_quotes(request):
+    quotes = (
+        Quote.objects.annotate(
+            likes=Count('votes', filter=Q(votes__value=1))
+        )
+        .order_by('-likes', '-views')[:10]
+        .select_related('source', 'added_by')  # для оптимизации
+    )
+    return render(request, 'backend/top_quotes.html', {'quotes': quotes})

@@ -1,8 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Цитаты источника: "{{ source }}"</h2>
-  <a href="{% url 'quotes_list' %}">&larr; Все цитаты</a>
+  <h2>Цитаты источника: "{{ source.name }}"</h2>
+  <ul>
+    <li><strong>Тип:</strong> {{ source.get_source_type_display }}</li>
+    {% if source.author %}
+      <li><strong>Автор:</strong> {{ source.author }}</li>
+    {% endif %}
+    {% if source.year %}
+      <li><strong>Год:</strong> {{ source.year }}</li>
+    {% endif %}
+    {% if source.details %}
+      <li><strong>Детали:</strong> {{ source.details }}</li>
+    {% endif %}
+  </ul>
+
   {% if quotes %}
     <ul>
       {% for quote in quotes %}
@@ -15,4 +27,6 @@
   {% else %}
     <p>У этого источника пока нет цитат.</p>
   {% endif %}
+
+    <a href="{% url 'quotes_list' %}">&larr; Все цитаты</a>
 {% endblock %}

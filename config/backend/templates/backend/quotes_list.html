@@ -44,7 +44,9 @@
   </p>
 {% endif %}
   <p><a href="{% url 'random_weighted_quote' %}">
-    <button type="button"></button>Показать случайную цитату</button></a></p>
+    <button type="button">Показать случайную цитату</button></a></p>
+    <p><a href="{% url 'top_quotes' %}">
+    <button type="button">Показать топ-10 цитат по лайкам</button></a></p>
   {% if page_obj.has_other_pages %}
     <nav>
       <ul style="list-style: none; display: flex; gap: 5px; padding: 0;">
@@ -63,54 +65,52 @@
     </nav>
   {% endif %}
 
-  <script>
+ <script>
     const csrfToken = '{{ csrf_token }}';
-    headers: {
-  'X-CSRFToken': csrfToken,
-  'Content-Type': 'application/x-www-form-urlencoded'
-}
-document.querySelectorAll('.quote').forEach(function(el) {
-  var quoteId = el.getAttribute('data-id');
-  var likeBtn = el.querySelector('.like-btn');
-  var dislikeBtn = el.querySelector('.dislike-btn');
-  var likeCount = el.querySelector('.like-count');
-  var dislikeCount = el.querySelector('.dislike-count');
 
-   if (likeBtn && !likeBtn.disabled) {
-    likeBtn.onclick = function() {
-      fetch("{% url 'vote_quote' %}", {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'quote_id=' + quoteId + '&value=1'
-      })
-      .then(response => response.json())
-      .then(data => {
-        likeCount.textContent = data.likes;
-        dislikeCount.textContent = data.dislikes;
-      });
-    };
-  }
+    document.querySelectorAll('.quote').forEach(function(el) {
+        var quoteId = el.getAttribute('data-id');
+        var likeBtn = el.querySelector('.like-btn');
+        var dislikeBtn = el.querySelector('.dislike-btn');
+        var likeCount = el.querySelector('.like-count');
+        var dislikeCount = el.querySelector('.dislike-count');
 
-  if (dislikeBtn && !dislikeBtn.disabled) {
-    dislikeBtn.onclick = function() {
-      fetch("{% url 'vote_quote' %}", {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'quote_id=' + quoteId + '&value=-1'
-      })
-      .then(response => response.json())
-      .then(data => {
-        likeCount.textContent = data.likes;
-        dislikeCount.textContent = data.dislikes;
-      });
-    };
-  }
-});
+        // Функция для отправки голоса
+        function sendVote(value) {
+            fetch('{% url 'vote_quote' %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'quote_id': quoteId,
+                    'value': value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    likeCount.textContent = data.likes;
+                    dislikeCount.textContent = data.dislikes;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Обработчики для кнопок
+        likeBtn.addEventListener('click', function() {
+            sendVote(1);
+        });
+
+        dislikeBtn.addEventListener('click', function() {
+            sendVote(-1);
+        });
+    });
 </script>
+
 {% endblock %}

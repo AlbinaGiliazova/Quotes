@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Топ 10 цитат{% endblock %}
+
+{% block content %}
+  <h1>Топ 10 цитат по лайкам</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Цитата</th>
+        <th>Источник</th>
+        <th>Добавил</th>
+        <th>Вес</th>
+        <th>Дата</th>
+        <th>Лайков</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for quote in quotes %}
+        <tr>
+          <td>{{ quote.text|linebreaksbr }}</td>
+          <td>{{ quote.source }}</td>
+          <td>
+            {% if quote.added_by %}
+              {{ quote.added_by.username }}
+            {% else %}
+              [аноним]
+            {% endif %}
+          </td>
+          <td>{{ quote.weight }}</td>
+          <td>{{ quote.created_at|date:"d.m.Y H:i" }}</td>
+          <td>{{ quote.likes }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6">Нет цитат.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p>
+    <a href="{% url 'quotes_list' %}">
+      <button type="button">Вернуться к списку цитат</button>
+    </a>
+  </p>
+{% endblock %}
