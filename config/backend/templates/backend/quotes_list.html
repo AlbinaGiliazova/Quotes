@@ -36,6 +36,10 @@
   </p>
   {% if user.is_authenticated %}
   <p>Вы авторизованы</p>
+  <form action="{% url 'logout' %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Выйти</button>
+</form>
 {% else %}
   <p>
     <a href="{% url 'login' %}">
